@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using TesteBackendEnContact.Core.Domain.ContactBook;
 using TesteBackendEnContact.Core.Interface.ContactBook;
 using TesteBackendEnContact.Repository.Interface;
+using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("contactbooks")]
     public class ContactBookController : ControllerBase
     {
         private readonly ILogger<ContactBookController> _logger;
@@ -22,19 +23,19 @@ namespace TesteBackendEnContact.Controllers
         }
 
         [HttpPost]
-        public async Task<IContactBook> Post(ContactBook contactBook) => await _contactBookRepository.SaveAsync(contactBook);
+        public async Task<ResultViewModel<IContactBook>> Post(ContactBook contactBook) => await _contactBookRepository.SaveAsync(contactBook);
 
 
-        [HttpDelete]
-        public async Task Delete(int id) => await _contactBookRepository.DeleteAsync(id);
+        [HttpDelete("{id}")]
+        public async Task<ResultViewModel<IContactBook>> Delete(int id) => await _contactBookRepository.DeleteAsync(id);
 
 
         [HttpGet]
-        public async Task<IEnumerable<IContactBook>> Get() => await _contactBookRepository.GetAllAsync();
+        public async Task<ResultViewModel<IEnumerable<IContactBook>>> Get() => await _contactBookRepository.GetAllAsync();
 
 
         [HttpGet("{id}")]
-        public async Task<IContactBook> Get(int id) => await _contactBookRepository.GetAsync(id);
+        public async Task<ResultViewModel<IContactBook>> Get(int id) => await _contactBookRepository.GetAsync(id);
 
     }
 }

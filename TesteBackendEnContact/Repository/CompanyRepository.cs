@@ -6,24 +6,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Core.Domain.ContactBook.Company;
+using TesteBackendEnContact.Core.Interface.ContactBook;
 using TesteBackendEnContact.Core.Interface.ContactBook.Company;
 using TesteBackendEnContact.Database;
 using TesteBackendEnContact.Repository.Interface;
+using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Repository
 {
     public class CompanyRepository : IRepository<ICompany>
     {
         private readonly DatabaseConfig databaseConfig;
+        private readonly IRepository<IContactBook> _contactBookRepository;
 
-        public CompanyRepository(DatabaseConfig databaseConfig)
+        public CompanyRepository(DatabaseConfig databaseConfig, IRepository<IContactBook> contactBookRepository)
         {
             this.databaseConfig = databaseConfig;
+            _contactBookRepository = contactBookRepository;
         }
 
-        public async Task<ICompany> SaveAsync(ICompany company)
+        public async Task<ResultViewModel<ICompany>> SaveAsync(ICompany company)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+
+            var contackBook = await _contactBookRepository.GetAsync(company.ContactBookId);
+            if (contackBook.Data == null) return new ResultViewModel<ICompany>("Não existe agenda com esse id");
+
             var dao = new CompanyDao(company);
 
             if (dao.Id == 0)
@@ -31,41 +39,46 @@ namespace TesteBackendEnContact.Repository
             else
                 await connection.UpdateAsync(dao);
 
-            return dao.Export();
+            return new ResultViewModel<ICompany>(dao.Export());
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<ResultViewModel<ICompany>> DeleteAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
-            var transaction = connection.BeginTransaction();
+            await connection.OpenAsync();
+            using var transaction = await connection.BeginTransactionAsync();
 
+            var company = await GetAsync(id);
+            if (company.Data == null) return new ResultViewModel<ICompany>("Não existe compania com esse id");
             var sql = new StringBuilder();
             sql.AppendLine("DELETE FROM Company WHERE Id = @id;");
             sql.AppendLine("UPDATE Contact SET CompanyId = null WHERE CompanyId = @id;");
 
             await connection.ExecuteAsync(sql.ToString(), new { id }, transaction);
             await transaction.CommitAsync();
-            await transaction.DisposeAsync();
+
+            return new ResultViewModel<ICompany>();
         }
 
-        public async Task<IEnumerable<ICompany>> GetAllAsync()
+        public async Task<ResultViewModel<IEnumerable<ICompany>>> GetAllAsync()
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             var query = "SELECT * FROM Company";
             var result = await connection.QueryAsync<CompanyDao>(query);
-
-            return result?.Select(item => item.Export());
+            var list = result.ToList();
+            return new ResultViewModel<IEnumerable<ICompany>>(result.ToList());
         }
 
-        public async Task<ICompany> GetAsync(int id)
+        public async Task<ResultViewModel<ICompany>> GetAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
-            var query = "SELECT * FROM Conpany where Id = @id";
-            var result = await connection.QuerySingleOrDefaultAsync<CompanyDao>(query, new { id });
+            var company = await connection.GetAsync<CompanyDao>(id);
 
-            return result?.Export();
+            if (company == null) return new ResultViewModel<ICompany>("Não existe compania com esse Id");
+
+            return new ResultViewModel<ICompany>(company);
         }
     }
 

@@ -8,6 +8,7 @@ using TesteBackendEnContact.Core.Domain.ContactBook;
 using TesteBackendEnContact.Core.Interface.ContactBook;
 using TesteBackendEnContact.Database;
 using TesteBackendEnContact.Repository.Interface;
+using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Repository
 {
@@ -21,32 +22,35 @@ namespace TesteBackendEnContact.Repository
         }
 
 
-        public async Task<IContactBook> SaveAsync(IContactBook contactBook)
+        public async Task<ResultViewModel<IContactBook>> SaveAsync(IContactBook contactBook)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
             var dao = new ContactBookDao(contactBook);
 
             dao.Id = await connection.InsertAsync(dao);
 
-            return dao.Export();
+            return new ResultViewModel<IContactBook>(dao.Export());
         }
 
 
-        public async Task DeleteAsync(int id)
+        public async Task<ResultViewModel<IContactBook>> DeleteAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
-            // TODO
+            var contactBook = await GetAsync(id);
+            if (contactBook.Data == null) return new ResultViewModel<IContactBook>("Não existe agenda com esse id");
             var sql = "DELETE FROM ContactBook WHERE Id = @id";
 
             await connection.ExecuteAsync(sql, new
             {
                 id
             });
+
+            return new ResultViewModel<IContactBook>();
         }
 
 
-        public async Task<IEnumerable<IContactBook>> GetAllAsync()
+        public async Task<ResultViewModel<IEnumerable<IContactBook>>> GetAllAsync()
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
@@ -55,16 +59,18 @@ namespace TesteBackendEnContact.Repository
 
             var returnList = new List<IContactBook>();
 
-            return result.ToList();
+            return new ResultViewModel<IEnumerable<IContactBook>>(result.ToList());
         }
 
-        public async Task<IContactBook> GetAsync(int id)
+        public async Task<ResultViewModel<IContactBook>> GetAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             var contactBook = await connection.GetAsync<ContactBookDao>(id);
 
-            return contactBook;
+            if (contactBook == null) return new ResultViewModel<IContactBook>("Não existe agenda com esse id");
+
+            return new ResultViewModel<IContactBook>(contactBook);
         }
     }
 

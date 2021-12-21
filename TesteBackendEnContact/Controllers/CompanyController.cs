@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using TesteBackendEnContact.Controllers.Models;
 using TesteBackendEnContact.Core.Interface.ContactBook.Company;
 using TesteBackendEnContact.Repository.Interface;
+using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("companies")]
     public class CompanyController : ControllerBase
     {
         private readonly ILogger<CompanyController> _logger;
@@ -27,20 +28,20 @@ namespace TesteBackendEnContact.Controllers
             return Ok(await _companyRepository.SaveAsync(company.ToCompany()));
         }
 
-        [HttpDelete]
-        public async Task Delete(int id)
+        [HttpDelete("{id}")]
+        public async Task<ResultViewModel<ICompany>> Delete(int id)
         {
-            await _companyRepository.DeleteAsync(id);
+            return await _companyRepository.DeleteAsync(id);
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ICompany>> Get()
+        public async Task<ResultViewModel<IEnumerable<ICompany>>> Get()
         {
             return await _companyRepository.GetAllAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ICompany> Get(int id)
+        public async Task<ResultViewModel<ICompany>> Get(int id)
         {
             return await _companyRepository.GetAsync(id);
         }
