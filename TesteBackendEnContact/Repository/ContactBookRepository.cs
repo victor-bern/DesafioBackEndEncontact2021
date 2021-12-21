@@ -32,14 +32,19 @@ namespace TesteBackendEnContact.Repository
         }
 
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             // TODO
-            var sql = "";
+            var sql = "DELETE FROM ContactBook WHERE Id = @id";
 
-            await connection.ExecuteAsync(sql);
+            var rows = await connection.ExecuteAsync(sql, new
+            {
+                id
+            });
+
+            return rows > 0;
         }
 
 
@@ -54,19 +59,16 @@ namespace TesteBackendEnContact.Repository
 
             var returnList = new List<IContactBook>();
 
-            foreach (var AgendaSalva in result.ToList())
-            {
-                IContactBook Agenda = new ContactBook(AgendaSalva.Id, AgendaSalva.Name.ToString());
-                returnList.Add(Agenda);
-            }
-
-            return returnList.ToList();
+            return result.ToList();
         }
+
         public async Task<IContactBook> GetAsync(int id)
         {
-            var list = await GetAllAsync();
+            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
-            return list.ToList().Where(item => item.Id == id).FirstOrDefault();
+            var contactBook = await connection.GetAsync<ContactBookDao>(id);
+
+            return contactBook;
         }
     }
 
@@ -84,7 +86,7 @@ namespace TesteBackendEnContact.Repository
         public ContactBookDao(IContactBook contactBook)
         {
             Id = contactBook.Id;
-            Name = Name;
+            Name = contactBook.Name;
         }
 
         public IContactBook Export() => new ContactBook(Id, Name);

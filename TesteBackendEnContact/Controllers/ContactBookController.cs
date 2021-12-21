@@ -20,27 +20,24 @@ namespace TesteBackendEnContact.Controllers
         }
 
         [HttpPost]
-        public async Task<IContactBook> Post(ContactBook contactBook, [FromServices] IContactBookRepository contactBookRepository)
-        {
-            return await contactBookRepository.SaveAsync(contactBook);
-        }
+        public async Task<IContactBook> Post(ContactBook contactBook, [FromServices] IContactBookRepository contactBookRepository) => await contactBookRepository.SaveAsync(contactBook);
+
 
         [HttpDelete]
-        public async Task Delete(int id, [FromServices] IContactBookRepository contactBookRepository)
+        public async Task<IActionResult> Delete(int id, [FromServices] IContactBookRepository contactBookRepository)
         {
-            await contactBookRepository.DeleteAsync(id);
+            var isDeleted = await contactBookRepository.DeleteAsync(id);
+            if (!isDeleted) return StatusCode(204);
+            return Ok();
+
         }
 
         [HttpGet]
-        public async Task<IEnumerable<IContactBook>> Get([FromServices] IContactBookRepository contactBookRepository)
-        {
-            return await contactBookRepository.GetAllAsync();
-        }
+        public async Task<IEnumerable<IContactBook>> Get([FromServices] IContactBookRepository contactBookRepository) => await contactBookRepository.GetAllAsync();
+
 
         [HttpGet("{id}")]
-        public async Task<IContactBook> Get(int id, [FromServices] IContactBookRepository contactBookRepository)
-        {
-            return await contactBookRepository.GetAsync(id);
-        }
+        public async Task<IContactBook> Get(int id, [FromServices] IContactBookRepository contactBookRepository) => await contactBookRepository.GetAsync(id);
+
     }
 }
