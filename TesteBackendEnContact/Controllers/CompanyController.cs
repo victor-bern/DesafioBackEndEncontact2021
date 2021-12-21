@@ -13,34 +13,36 @@ namespace TesteBackendEnContact.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly ILogger<CompanyController> _logger;
+        private readonly IRepository<ICompany> _companyRepository;
 
-        public CompanyController(ILogger<CompanyController> logger)
+        public CompanyController(ILogger<CompanyController> logger, IRepository<ICompany> companyRepository)
         {
             _logger = logger;
+            _companyRepository = companyRepository;
         }
 
         [HttpPost]
-        public async Task<ActionResult<ICompany>> Post(SaveCompanyRequest company, [FromServices] ICompanyRepository companyRepository)
+        public async Task<ActionResult<ICompany>> Post(SaveCompanyRequest company)
         {
-            return Ok(await companyRepository.SaveAsync(company.ToCompany()));
+            return Ok(await _companyRepository.SaveAsync(company.ToCompany()));
         }
 
         [HttpDelete]
-        public async Task Delete(int id, [FromServices] ICompanyRepository companyRepository)
+        public async Task Delete(int id)
         {
-            await companyRepository.DeleteAsync(id);
+            await _companyRepository.DeleteAsync(id);
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ICompany>> Get([FromServices] ICompanyRepository companyRepository)
+        public async Task<IEnumerable<ICompany>> Get()
         {
-            return await companyRepository.GetAllAsync();
+            return await _companyRepository.GetAllAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ICompany> Get(int id, [FromServices] ICompanyRepository companyRepository)
+        public async Task<ICompany> Get(int id)
         {
-            return await companyRepository.GetAsync(id);
+            return await _companyRepository.GetAsync(id);
         }
     }
 }

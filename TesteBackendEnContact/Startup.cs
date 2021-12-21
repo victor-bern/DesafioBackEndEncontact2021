@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
 using System;
+using TesteBackendEnContact.Core.Interface.ContactBook;
+using TesteBackendEnContact.Core.Interface.ContactBook.Company;
 using TesteBackendEnContact.Database;
 using TesteBackendEnContact.Repository;
 using TesteBackendEnContact.Repository.Interface;
@@ -39,8 +41,8 @@ namespace TesteBackendEnContact
                     .AddLogging(lb => lb.AddFluentMigratorConsole());
 
             services.AddSingleton(new DatabaseConfig { ConnectionString = Configuration.GetConnectionString("DefaultConnection") });
-            services.AddScoped<IContactBookRepository, ContactBookRepository>();
-            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<IRepository<IContactBook>, ContactBookRepository>();
+            services.AddScoped<IRepository<ICompany>, CompanyRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

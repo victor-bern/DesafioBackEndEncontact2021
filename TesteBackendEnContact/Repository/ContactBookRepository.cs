@@ -11,7 +11,7 @@ using TesteBackendEnContact.Repository.Interface;
 
 namespace TesteBackendEnContact.Repository
 {
-    public class ContactBookRepository : IContactBookRepository
+    public class ContactBookRepository : IRepository<IContactBook>
     {
         private readonly DatabaseConfig databaseConfig;
 
@@ -32,22 +32,18 @@ namespace TesteBackendEnContact.Repository
         }
 
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             // TODO
             var sql = "DELETE FROM ContactBook WHERE Id = @id";
 
-            var rows = await connection.ExecuteAsync(sql, new
+            await connection.ExecuteAsync(sql, new
             {
                 id
             });
-
-            return rows > 0;
         }
-
-
 
 
         public async Task<IEnumerable<IContactBook>> GetAllAsync()

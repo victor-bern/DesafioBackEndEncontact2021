@@ -12,7 +12,7 @@ using TesteBackendEnContact.Repository.Interface;
 
 namespace TesteBackendEnContact.Repository
 {
-    public class CompanyRepository : ICompanyRepository
+    public class CompanyRepository : IRepository<ICompany>
     {
         private readonly DatabaseConfig databaseConfig;
 
@@ -37,13 +37,15 @@ namespace TesteBackendEnContact.Repository
         public async Task DeleteAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
-            using var transaction = connection.BeginTransaction();
+            var transaction = connection.BeginTransaction();
 
             var sql = new StringBuilder();
             sql.AppendLine("DELETE FROM Company WHERE Id = @id;");
             sql.AppendLine("UPDATE Contact SET CompanyId = null WHERE CompanyId = @id;");
 
             await connection.ExecuteAsync(sql.ToString(), new { id }, transaction);
+            await transaction.CommitAsync();
+            await transaction.DisposeAsync();
         }
 
         public async Task<IEnumerable<ICompany>> GetAllAsync()
