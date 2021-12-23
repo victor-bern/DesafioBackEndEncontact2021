@@ -43,7 +43,7 @@ namespace TesteBackendEnContact.Repository
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<ICompany>("Houve um erro ao tentar atualizar os dados");
+                return new ResultViewModel<ICompany>("Houve um erro ao tentar salvar os dados");
             }
             catch (Exception)
             {
@@ -65,7 +65,7 @@ namespace TesteBackendEnContact.Repository
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IEnumerable<ICompany>>("Houve um erro ao tentar atualizar os dados");
+                return new ResultViewModel<IEnumerable<ICompany>>("Houve um erro ao tentar recuperar os dados");
             }
             catch (Exception)
             {

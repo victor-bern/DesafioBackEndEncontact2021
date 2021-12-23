@@ -145,7 +145,7 @@ namespace TesteBackendEnContact.Repository
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IContact>("Houve um erro ao tentar atualizar os dados");
+                return new ResultViewModel<IContact>("Houve um erro ao tentar deletar os dados");
             }
             catch (Exception)
             {

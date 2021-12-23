@@ -36,7 +36,7 @@ namespace TesteBackendEnContact.Repository
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IContactBook>("Houve um erro ao tentar recuperar os dados");
+                return new ResultViewModel<IContactBook>("Houve um erro ao tentar salvar os dados");
             }
             catch (Exception)
             {
