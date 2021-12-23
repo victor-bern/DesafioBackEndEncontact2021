@@ -80,6 +80,11 @@ namespace TesteBackendEnContact.Repository
 
             return new ResultViewModel<ICompany>(company);
         }
+
+        public Task<ResultViewModel<ICompany>> UpdateAsync(int id, ICompany entity)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     [Table("Company")]

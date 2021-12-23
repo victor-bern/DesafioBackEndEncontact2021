@@ -57,8 +57,6 @@ namespace TesteBackendEnContact.Repository
             var query = "SELECT * FROM ContactBook";
             var result = await connection.QueryAsync<ContactBookDao>(query);
 
-            var returnList = new List<IContactBook>();
-
             return new ResultViewModel<IEnumerable<IContactBook>>(result.ToList());
         }
 
@@ -71,6 +69,11 @@ namespace TesteBackendEnContact.Repository
             if (contactBook == null) return new ResultViewModel<IContactBook>("Não existe agenda com esse id");
 
             return new ResultViewModel<IContactBook>(contactBook);
+        }
+
+        public Task<ResultViewModel<IContactBook>> UpdateAsync(int id, IContactBook entity)
+        {
+            throw new System.NotImplementedException();
         }
     }
 

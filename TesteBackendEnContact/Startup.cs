@@ -43,6 +43,7 @@ namespace TesteBackendEnContact
             services.AddSingleton(new DatabaseConfig { ConnectionString = Configuration.GetConnectionString("DefaultConnection") });
             services.AddScoped<IRepository<IContactBook>, ContactBookRepository>();
             services.AddScoped<IRepository<ICompany>, CompanyRepository>();
+            services.AddScoped<IContactRepository, ContactRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
