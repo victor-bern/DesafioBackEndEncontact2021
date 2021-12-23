@@ -12,6 +12,8 @@ using TesteBackendEnContact.Core.Interface.ContactBook.Company;
 using TesteBackendEnContact.Database;
 using TesteBackendEnContact.Repository;
 using TesteBackendEnContact.Repository.Interface;
+using TesteBackendEnContact.Services;
+using TesteBackendEnContact.Services.Interface;
 
 namespace TesteBackendEnContact
 {
@@ -44,6 +46,7 @@ namespace TesteBackendEnContact
             services.AddScoped<IRepository<IContactBook>, ContactBookRepository>();
             services.AddScoped<IRepository<ICompany>, CompanyRepository>();
             services.AddScoped<IContactRepository, ContactRepository>();
+            services.AddScoped<IContactService, ContactService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

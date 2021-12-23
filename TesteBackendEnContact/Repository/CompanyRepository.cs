@@ -15,7 +15,7 @@ using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Repository
 {
-    public class CompanyRepository : IRepository<ICompany>
+    public class CompanyRepository : ICompanyRepository
     {
         private readonly DatabaseConfig _databaseConfig;
         private readonly IRepository<IContactBook> _contactBookRepository;
@@ -98,6 +98,30 @@ namespace TesteBackendEnContact.Repository
 
         }
 
+        public async Task<ResultViewModel<ICompany>> GetCompanyByNameAsync(string name)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
+
+                var query = "SELECT * FROM Company WHERE Name iLIKE %@name%";
+                var company = await connection.QueryFirstOrDefaultAsync<Company>(query);
+
+                if (company == null) return new ResultViewModel<ICompany>("Não foi encontrada nenhuma empresa");
+
+                return new ResultViewModel<ICompany>(company);
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<ICompany>("Houve um erro ao tentar recuperar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<ICompany>("Internal Server Error");
+            }
+
+
+        }
         public async Task<ResultViewModel<ICompany>> UpdateAsync(int id, ICompany entity)
         {
             try
@@ -149,6 +173,8 @@ namespace TesteBackendEnContact.Repository
                 return new ResultViewModel<ICompany>("Internal Server Error");
             }
         }
+
+
     }
 
 }

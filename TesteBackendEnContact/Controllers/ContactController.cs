@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TesteBackendEnContact.Controllers.Models;
 using TesteBackendEnContact.Core.Domain.ContactBook.Contact;
 using TesteBackendEnContact.Core.Interface.ContactBook.Contact;
 using TesteBackendEnContact.Repository.Interface;
@@ -34,6 +35,9 @@ namespace TesteBackendEnContact.Controllers
 
         [HttpPost]
         public async Task<ResultViewModel<IContact>> Save([FromBody] Contact model) => await _contactRepository.SaveAsync(model);
+
+        [HttpPost("send-contacts")]
+        public async Task<IActionResult> UploadFile([FromForm] ContactFormFile model) => Ok(await _contactRepository.UploadContactsByFile(model.file));
 
         [HttpPut("{id}")]
         public async Task<ResultViewModel<IContact>> Update(int id, [FromBody] Contact model) => await _contactRepository.UpdateAsync(id, model);

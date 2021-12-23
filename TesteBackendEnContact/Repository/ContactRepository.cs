@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using TesteBackendEnContact.Core.Domain.ContactBook.Contact;
 using TesteBackendEnContact.Core.Interface.ContactBook.Contact;
 using TesteBackendEnContact.Database;
 using TesteBackendEnContact.Repository.Interface;
+using TesteBackendEnContact.Services.Interface;
 using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Repository
@@ -17,9 +19,11 @@ namespace TesteBackendEnContact.Repository
     {
 
         private readonly DatabaseConfig _databaseConfig;
-        public ContactRepository(DatabaseConfig databaseConfig)
+        private readonly IContactService _contactService;
+        public ContactRepository(DatabaseConfig databaseConfig, IContactService contactService)
         {
             _databaseConfig = databaseConfig;
+            _contactService = contactService;
         }
 
         public async Task<ResultViewModel<IEnumerable<IContact>>> GetAllAsync()
@@ -153,6 +157,11 @@ namespace TesteBackendEnContact.Repository
             }
         }
 
+        public async Task<ResultViewModel<List<IContact>>> UploadContactsByFile(IFormFile file)
+        {
+            var contacts = await _contactService.ExtractContacts(file);
 
+            return new ResultViewModel<List<IContact>>();
+        }
     }
 }
