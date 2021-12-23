@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,96 +17,138 @@ namespace TesteBackendEnContact.Repository
 {
     public class CompanyRepository : IRepository<ICompany>
     {
-        private readonly DatabaseConfig databaseConfig;
+        private readonly DatabaseConfig _databaseConfig;
         private readonly IRepository<IContactBook> _contactBookRepository;
 
         public CompanyRepository(DatabaseConfig databaseConfig, IRepository<IContactBook> contactBookRepository)
         {
-            this.databaseConfig = databaseConfig;
+            _databaseConfig = databaseConfig;
             _contactBookRepository = contactBookRepository;
         }
 
-        public async Task<ResultViewModel<ICompany>> SaveAsync(ICompany company)
+        public async Task<ResultViewModel<ICompany>> SaveAsync(ICompany entity)
         {
-            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
 
-            var contackBook = await _contactBookRepository.GetAsync(company.ContactBookId);
-            if (contackBook.Data == null) return new ResultViewModel<ICompany>("Não existe agenda com esse id");
+                var contackBook = await _contactBookRepository.GetAsync(entity.ContactBookId);
+                if (contackBook.Data == null) return new ResultViewModel<ICompany>("Nenhuma agenda encontrada não foi possivel salvar");
 
-            var dao = new CompanyDao(company);
+                var company = new Company(entity);
 
-            if (dao.Id == 0)
-                dao.Id = await connection.InsertAsync(dao);
-            else
-                await connection.UpdateAsync(dao);
+                await connection.InsertAsync(company);
 
-            return new ResultViewModel<ICompany>(dao.Export());
-        }
+                return new ResultViewModel<ICompany>(company);
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<ICompany>("Houve um erro ao tentar atualizar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<ICompany>("Internal Server Error");
+            }
 
-        public async Task<ResultViewModel<ICompany>> DeleteAsync(int id)
-        {
-            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
-            await connection.OpenAsync();
-            using var transaction = await connection.BeginTransactionAsync();
-
-            var company = await GetAsync(id);
-            if (company.Data == null) return new ResultViewModel<ICompany>("Não existe compania com esse id");
-            var sql = new StringBuilder();
-            sql.AppendLine("DELETE FROM Company WHERE Id = @id;");
-            sql.AppendLine("UPDATE Contact SET CompanyId = null WHERE CompanyId = @id;");
-
-            await connection.ExecuteAsync(sql.ToString(), new { id }, transaction);
-            await transaction.CommitAsync();
-
-            return new ResultViewModel<ICompany>();
         }
 
         public async Task<ResultViewModel<IEnumerable<ICompany>>> GetAllAsync()
         {
-            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
 
-            var query = "SELECT * FROM Company";
-            var result = await connection.QueryAsync<CompanyDao>(query);
-            var list = result.ToList();
-            return new ResultViewModel<IEnumerable<ICompany>>(result.ToList());
+                var query = "SELECT * FROM Company";
+                var result = await connection.QueryAsync<Company>(query);
+                var list = result.ToList();
+                return new ResultViewModel<IEnumerable<ICompany>>(result.ToList());
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<IEnumerable<ICompany>>("Houve um erro ao tentar atualizar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<IEnumerable<ICompany>>("Internal Server Error");
+            }
+
         }
 
         public async Task<ResultViewModel<ICompany>> GetAsync(int id)
         {
-            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
 
-            var company = await connection.GetAsync<CompanyDao>(id);
+                var company = await connection.GetAsync<Company>(id);
 
-            if (company == null) return new ResultViewModel<ICompany>("Não existe compania com esse Id");
+                if (company == null) return new ResultViewModel<ICompany>("Não foi encontrada nenhuma empresa");
 
-            return new ResultViewModel<ICompany>(company);
+                return new ResultViewModel<ICompany>(company);
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<ICompany>("Houve um erro ao tentar recuperar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<ICompany>("Internal Server Error");
+            }
+
+
         }
 
-        public Task<ResultViewModel<ICompany>> UpdateAsync(int id, ICompany entity)
+        public async Task<ResultViewModel<ICompany>> UpdateAsync(int id, ICompany entity)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
+                var company = await connection.GetAsync<Company>(id);
+                if (company == null) return new ResultViewModel<ICompany>("Empresa não encontrada");
+                company.Name = string.IsNullOrEmpty(entity.Name) ? company.Name : entity.Name;
+
+                await connection.UpdateAsync(company);
+
+                return new ResultViewModel<ICompany>(company);
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<ICompany>("Houve um erro ao tentar atualizar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<ICompany>("Internal Server Error");
+            }
+        }
+
+        public async Task<ResultViewModel<ICompany>> DeleteAsync(int id)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
+                await connection.OpenAsync();
+                using var transaction = await connection.BeginTransactionAsync();
+
+                var company = await GetAsync(id);
+                if (company.Data == null) return new ResultViewModel<ICompany>("Não existe compania com esse id");
+                var sql = new StringBuilder();
+                sql.AppendLine("DELETE FROM Company WHERE Id = @id;");
+                sql.AppendLine("UPDATE Contact SET CompanyId = null WHERE CompanyId = @id;");
+
+                await connection.ExecuteAsync(sql.ToString(), new { id }, transaction);
+                await transaction.CommitAsync();
+
+                return new ResultViewModel<ICompany>();
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<ICompany>("Houve um erro ao tentar deletar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<ICompany>("Internal Server Error");
+            }
         }
     }
 
-    [Table("Company")]
-    public class CompanyDao : ICompany
-    {
-        [Key]
-        public int Id { get; set; }
-        public int ContactBookId { get; set; }
-        public string Name { get; set; }
-
-        public CompanyDao()
-        {
-        }
-
-        public CompanyDao(ICompany company)
-        {
-            Id = company.Id;
-            ContactBookId = company.ContactBookId;
-            Name = company.Name;
-        }
-
-        public ICompany Export() => new Company(Id, ContactBookId, Name);
-    }
 }

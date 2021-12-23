@@ -105,16 +105,54 @@ namespace TesteBackendEnContact.Repository
 
         }
 
-
-
-        public Task<ResultViewModel<IContact>> DeleteAsync(int id)
+        public async Task<ResultViewModel<IContact>> UpdateAsync(int id, IContact entity)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
+                var contact = await connection.GetAsync<Contact>(id);
+                if (contact == null) return new ResultViewModel<IContact>("Contato não encontrado");
+                contact.Name = string.IsNullOrEmpty(entity.Name) ? contact.Name : entity.Name;
+                contact.Phone = string.IsNullOrEmpty(entity.Phone) ? contact.Phone : entity.Phone;
+                contact.Email = string.IsNullOrEmpty(entity.Email) ? contact.Email : entity.Email;
+                contact.Address = string.IsNullOrEmpty(entity.Address) ? contact.Address : entity.Address;
+
+                await connection.UpdateAsync(contact);
+
+                return new ResultViewModel<IContact>(contact);
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<IContact>("Houve um erro ao tentar atualizar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<IContact>("Internal Server Error");
+            }
         }
 
-        public Task<ResultViewModel<IContact>> UpdateAsync(int id, IContact entity)
+        public async Task<ResultViewModel<IContact>> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
+                var contact = await connection.GetAsync<Contact>(id);
+                if (contact == null) return new ResultViewModel<IContact>("Contato não encontrado");
+
+                await connection.DeleteAsync(contact);
+
+                return new ResultViewModel<IContact>();
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<IContact>("Houve um erro ao tentar atualizar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<IContact>("Internal Server Error");
+            }
         }
+
+
     }
 }

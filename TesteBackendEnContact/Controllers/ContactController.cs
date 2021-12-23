@@ -35,5 +35,11 @@ namespace TesteBackendEnContact.Controllers
         [HttpPost]
         public async Task<ResultViewModel<IContact>> Save([FromBody] Contact model) => await _contactRepository.SaveAsync(model);
 
+        [HttpPut("{id}")]
+        public async Task<ResultViewModel<IContact>> Update(int id, [FromBody] Contact model) => await _contactRepository.UpdateAsync(id, model);
+
+        [HttpDelete("{id}")]
+        public async Task<ResultViewModel<IContact>> Delete(int id) => await _contactRepository.DeleteAsync(id);
+
     }
 }

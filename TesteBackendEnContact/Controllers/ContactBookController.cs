@@ -22,20 +22,23 @@ namespace TesteBackendEnContact.Controllers
             _contactBookRepository = contactBookRepository;
         }
 
+
+        [HttpGet]
+        public async Task<ResultViewModel<IEnumerable<IContactBook>>> Get() => await _contactBookRepository.GetAllAsync();
+
+        [HttpGet("{id}")]
+        public async Task<ResultViewModel<IContactBook>> Get(int id) => await _contactBookRepository.GetAsync(id);
+
         [HttpPost]
         public async Task<ResultViewModel<IContactBook>> Post(ContactBook contactBook) => await _contactBookRepository.SaveAsync(contactBook);
 
+        [HttpPut("{id}")]
+        public async Task<ResultViewModel<IContactBook>> Update(int id, [FromBody] ContactBook model) => await _contactBookRepository.UpdateAsync(id, model);
 
         [HttpDelete("{id}")]
         public async Task<ResultViewModel<IContactBook>> Delete(int id) => await _contactBookRepository.DeleteAsync(id);
 
 
-        [HttpGet]
-        public async Task<ResultViewModel<IEnumerable<IContactBook>>> Get() => await _contactBookRepository.GetAllAsync();
-
-
-        [HttpGet("{id}")]
-        public async Task<ResultViewModel<IContactBook>> Get(int id) => await _contactBookRepository.GetAsync(id);
 
     }
 }

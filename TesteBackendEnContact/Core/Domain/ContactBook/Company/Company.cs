@@ -1,18 +1,26 @@
-﻿using TesteBackendEnContact.Core.Interface.ContactBook.Company;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using TesteBackendEnContact.Core.Interface.ContactBook.Company;
 
 namespace TesteBackendEnContact.Core.Domain.ContactBook.Company
 {
+    [Table("Company")]
     public class Company : ICompany
     {
         public int Id { get; private set; }
         public int ContactBookId { get; private set; }
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
-        public Company(int id, int contactBookId, string name)
+
+        public Company()
         {
-            Id = id;
-            ContactBookId = contactBookId;
-            Name = name;
+
+        }
+
+        public Company(ICompany company)
+        {
+            Id = company.Id;
+            ContactBookId = company.ContactBookId;
+            Name = company.Name;
         }
     }
 }

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TesteBackendEnContact.Controllers.Models;
+using TesteBackendEnContact.Core.Domain.ContactBook.Company;
 using TesteBackendEnContact.Core.Interface.ContactBook.Company;
 using TesteBackendEnContact.Repository.Interface;
 using TesteBackendEnContact.ViewModels;
@@ -22,28 +22,19 @@ namespace TesteBackendEnContact.Controllers
             _companyRepository = companyRepository;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ICompany>> Post(SaveCompanyRequest company)
-        {
-            return Ok(await _companyRepository.SaveAsync(company.ToCompany()));
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ResultViewModel<ICompany>> Delete(int id)
-        {
-            return await _companyRepository.DeleteAsync(id);
-        }
-
         [HttpGet]
-        public async Task<ResultViewModel<IEnumerable<ICompany>>> Get()
-        {
-            return await _companyRepository.GetAllAsync();
-        }
+        public async Task<ResultViewModel<IEnumerable<ICompany>>> Get() => await _companyRepository.GetAllAsync();
 
         [HttpGet("{id}")]
-        public async Task<ResultViewModel<ICompany>> Get(int id)
-        {
-            return await _companyRepository.GetAsync(id);
-        }
+        public async Task<ResultViewModel<ICompany>> Get(int id) => await _companyRepository.GetAsync(id);
+
+        [HttpPost]
+        public async Task<ResultViewModel<ICompany>> Post([FromBody] Company company) => await _companyRepository.SaveAsync(company);
+
+        [HttpPut("{id}")]
+        public async Task<ResultViewModel<ICompany>> Update(int id, [FromBody] Company model) => await _companyRepository.UpdateAsync(id, model);
+
+        [HttpDelete("{id}")]
+        public async Task<ResultViewModel<ICompany>> Delete(int id) => await _companyRepository.DeleteAsync(id);
     }
 }
