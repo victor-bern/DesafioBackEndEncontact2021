@@ -9,9 +9,9 @@ using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Controllers
 {
-    [ApiController]
+    [Controller]
     [Route("users")]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserRepository _userRepository;
@@ -29,16 +29,26 @@ namespace TesteBackendEnContact.Controllers
         public async Task<ResultViewModel<User>> Get(int id) => await _userRepository.GetAsync(id);
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] User company)
+        public async Task<IActionResult> Post([FromBody] User model)
         {
             if (!ModelState.IsValid) return BadRequest(new ResultViewModel<User>(ModelState.GetErrors()));
-            await _userRepository.SaveAsync(company);
 
-            return Ok(company);
+            var user = await _userRepository.SaveAsync(model);
+
+            if (user.Errors.Count > 0) return BadRequest(user);
+
+            return Ok(model);
         }
 
         [HttpPut("{id}")]
-        public async Task<ResultViewModel<User>> Update(int id, [FromBody] User model) => await _userRepository.UpdateAsync(id, model);
+        public async Task<IActionResult> Update(int id, [FromBody] User model)
+        {
+            if (!ModelState.IsValid) return BadRequest(new ResultViewModel<User>(ModelState.GetErrors()));
+
+
+            var user = await _userRepository.UpdateAsync(id, model);
+            return Ok(user.Data);
+        }
 
         [HttpDelete("{id}")]
         public async Task<ResultViewModel<User>> Delete(int id) => await _userRepository.DeleteAsync(id);

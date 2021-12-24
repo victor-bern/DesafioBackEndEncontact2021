@@ -69,7 +69,7 @@ namespace TesteBackendEnContact.Repository
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<User>("Houve um erro ao tentar salvar os dados");
+                return new ResultViewModel<User>("Já existe um usuário com este email");
             }
             catch (Exception)
             {
