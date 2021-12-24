@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Core.Domain.User;
+using TesteBackendEnContact.Extensions;
 using TesteBackendEnContact.Repository.Interface;
 using TesteBackendEnContact.ViewModels;
 
@@ -30,7 +31,10 @@ namespace TesteBackendEnContact.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] User company)
         {
-            return Ok();
+            if (!ModelState.IsValid) return BadRequest(new ResultViewModel<User>(ModelState.GetErrors()));
+            await _userRepository.SaveAsync(company);
+
+            return Ok(company);
         }
 
         [HttpPut("{id}")]
