@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Core.Domain.ContactBook;
-using TesteBackendEnContact.Core.Interface.ContactBook;
 using TesteBackendEnContact.Database;
 using TesteBackendEnContact.Repository.Interface;
 using TesteBackendEnContact.ViewModels;
 
 namespace TesteBackendEnContact.Repository
 {
-    public class ContactBookRepository : IRepository<IContactBook>
+    public class ContactBookRepository : IContactBookRepository
     {
         private readonly DatabaseConfig _databaseConfig;
 
@@ -23,7 +22,7 @@ namespace TesteBackendEnContact.Repository
         }
 
 
-        public async Task<ResultViewModel<IContactBook>> SaveAsync(IContactBook entity)
+        public async Task<ResultViewModel<ContactBook>> SaveAsync(ContactBook entity)
         {
             try
             {
@@ -32,21 +31,21 @@ namespace TesteBackendEnContact.Repository
 
                 contactBook.Id = await connection.InsertAsync(contactBook);
 
-                return new ResultViewModel<IContactBook>(contactBook);
+                return new ResultViewModel<ContactBook>(contactBook);
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IContactBook>("Houve um erro ao tentar salvar os dados");
+                return new ResultViewModel<ContactBook>("Houve um erro ao tentar salvar os dados");
             }
             catch (Exception)
             {
-                return new ResultViewModel<IContactBook>("Internal Server Error");
+                return new ResultViewModel<ContactBook>("Internal Server Error");
             }
 
         }
 
 
-        public async Task<ResultViewModel<IEnumerable<IContactBook>>> GetAllAsync()
+        public async Task<ResultViewModel<IEnumerable<ContactBook>>> GetAllAsync()
         {
             try
             {
@@ -55,21 +54,21 @@ namespace TesteBackendEnContact.Repository
                 var query = "SELECT * FROM ContactBook";
                 var result = await connection.QueryAsync<ContactBook>(query);
 
-                return new ResultViewModel<IEnumerable<IContactBook>>(result.ToList());
+                return new ResultViewModel<IEnumerable<ContactBook>>(result.ToList());
 
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IEnumerable<IContactBook>>("Houve um erro ao tentar recuperar os dados");
+                return new ResultViewModel<IEnumerable<ContactBook>>("Houve um erro ao tentar recuperar os dados");
             }
             catch (Exception)
             {
-                return new ResultViewModel<IEnumerable<IContactBook>>("Erro interno");
+                return new ResultViewModel<IEnumerable<ContactBook>>("Erro interno");
             }
 
         }
 
-        public async Task<ResultViewModel<IContactBook>> GetAsync(int id)
+        public async Task<ResultViewModel<ContactBook>> GetAsync(int id)
         {
             try
             {
@@ -77,64 +76,88 @@ namespace TesteBackendEnContact.Repository
 
                 var contactBook = await connection.GetAsync<ContactBook>(id);
 
-                if (contactBook == null) return new ResultViewModel<IContactBook>("Agenda não encontrada");
+                if (contactBook == null) return new ResultViewModel<ContactBook>("Agenda não encontrada");
 
-                return new ResultViewModel<IContactBook>(contactBook);
+                return new ResultViewModel<ContactBook>(contactBook);
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IContactBook>("Houve um erro ao tentar recuperar os dados");
+                return new ResultViewModel<ContactBook>("Houve um erro ao tentar recuperar os dados");
             }
             catch (Exception)
             {
-                return new ResultViewModel<IContactBook>("Internal Server Error");
+                return new ResultViewModel<ContactBook>("Internal Server Error");
             }
         }
 
-        public async Task<ResultViewModel<IContactBook>> UpdateAsync(int id, IContactBook entity)
+        public async Task<ResultViewModel<ContactBook>> UpdateAsync(int id, ContactBook entity)
         {
             try
             {
                 using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
                 var contactBook = await connection.GetAsync<ContactBook>(id);
-                if (contactBook == null) return new ResultViewModel<IContactBook>("Agenda não encontrada");
+                if (contactBook == null) return new ResultViewModel<ContactBook>("Agenda não encontrada");
                 contactBook.Name = string.IsNullOrEmpty(entity.Name) ? contactBook.Name : entity.Name;
 
                 await connection.UpdateAsync(contactBook);
 
-                return new ResultViewModel<IContactBook>(contactBook);
+                return new ResultViewModel<ContactBook>(contactBook);
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IContactBook>("Houve um erro ao tentar atualizar os dados");
+                return new ResultViewModel<ContactBook>("Houve um erro ao tentar atualizar os dados");
             }
             catch (Exception)
             {
-                return new ResultViewModel<IContactBook>("Internal Server Error");
+                return new ResultViewModel<ContactBook>("Internal Server Error");
             }
         }
 
-        public async Task<ResultViewModel<IContactBook>> DeleteAsync(int id)
+        public async Task<ResultViewModel<ContactBook>> DeleteAsync(int id)
         {
             try
             {
                 using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
 
                 var contactBook = await GetAsync(id);
-                if (contactBook.Data == null) return new ResultViewModel<IContactBook>("Não existe agenda com esse id");
+                if (contactBook.Data == null) return new ResultViewModel<ContactBook>("Não existe agenda com esse id");
                 await connection.DeleteAsync(contactBook);
 
-                return new ResultViewModel<IContactBook>();
+                return new ResultViewModel<ContactBook>();
             }
             catch (SqliteException)
             {
-                return new ResultViewModel<IContactBook>("Houve um erro ao tentar deletar os dados");
+                return new ResultViewModel<ContactBook>("Houve um erro ao tentar deletar os dados");
             }
             catch (Exception)
             {
-                return new ResultViewModel<IContactBook>("Internal Server Error");
+                return new ResultViewModel<ContactBook>("Internal Server Error");
             }
 
+        }
+
+        public async Task<ResultViewModel<ContactBook>> GetByNameAsync(string name)
+        {
+            try
+            {
+                name = name.Trim().ToLower();
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
+
+                var query = "SELECT * FROM ContactBook WHERE LOWER(Name) = @name";
+                var contactBook = await connection.QueryFirstOrDefaultAsync<ContactBook>(query, new { name });
+
+                if (contactBook == null) return new ResultViewModel<ContactBook>("Não foi encontrada nenhuma agenda");
+
+                return new ResultViewModel<ContactBook>(contactBook);
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<ContactBook>("Houve um erro ao tentar recuperar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<ContactBook>("Internal Server Error");
+            }
         }
     }
 }

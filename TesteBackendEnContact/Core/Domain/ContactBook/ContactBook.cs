@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TesteBackendEnContact.Core.Interface.ContactBook;
 
 namespace TesteBackendEnContact.Core.Domain.ContactBook
 {
     [Table("ContactBook")]
-    public class ContactBook : IContactBook
+    public class ContactBook : Base
     {
-        public int Id { get; set; }
         public string Name { get; set; }
 
         public ContactBook()
@@ -14,9 +12,8 @@ namespace TesteBackendEnContact.Core.Domain.ContactBook
 
         }
 
-        public ContactBook(IContactBook contactBook)
+        public ContactBook(ContactBook contactBook) : base(contactBook.Id)
         {
-            Id = contactBook.Id;
             Name = contactBook.Name;
         }
     }

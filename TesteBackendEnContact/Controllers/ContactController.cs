@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Controllers.Models;
 using TesteBackendEnContact.Core.Domain.ContactBook.Contact;
-using TesteBackendEnContact.Core.Interface.ContactBook.Contact;
 using TesteBackendEnContact.Repository.Interface;
 using TesteBackendEnContact.ViewModels;
 
@@ -24,26 +23,26 @@ namespace TesteBackendEnContact.Controllers
         }
 
         [HttpGet("search-by-param")]
-        public async Task<ResultViewModel<IContact>> GeyByParam([FromQuery] string param, [FromQuery] string value) => await _contactRepository.GetByParamAsync(param, value);
+        public async Task<ResultViewModel<Contact>> GeyByParam([FromQuery] string param, [FromQuery] string value) => await _contactRepository.GetByParamAsync(param, value);
 
         [HttpGet]
-        public async Task<ResultViewModel<IEnumerable<IContact>>> Get() => await _contactRepository.GetAllAsync();
+        public async Task<ResultViewModel<IEnumerable<Contact>>> Get() => await _contactRepository.GetAllAsync();
 
         [HttpGet("{id}")]
-        public async Task<ResultViewModel<IContact>> GetById(int id) => await _contactRepository.GetAsync(id);
+        public async Task<ResultViewModel<Contact>> GetById(int id) => await _contactRepository.GetAsync(id);
 
 
         [HttpPost]
-        public async Task<ResultViewModel<IContact>> Save([FromBody] Contact model) => await _contactRepository.SaveAsync(model);
+        public async Task<ResultViewModel<Contact>> Save([FromBody] Contact model) => await _contactRepository.SaveAsync(model);
 
         [HttpPost("send-contacts")]
         public async Task<IActionResult> UploadFile([FromForm] ContactFormFile model) => Ok(await _contactRepository.UploadContactsByFile(model.file));
 
         [HttpPut("{id}")]
-        public async Task<ResultViewModel<IContact>> Update(int id, [FromBody] Contact model) => await _contactRepository.UpdateAsync(id, model);
+        public async Task<ResultViewModel<Contact>> Update(int id, [FromBody] Contact model) => await _contactRepository.UpdateAsync(id, model);
 
         [HttpDelete("{id}")]
-        public async Task<ResultViewModel<IContact>> Delete(int id) => await _contactRepository.DeleteAsync(id);
+        public async Task<ResultViewModel<Contact>> Delete(int id) => await _contactRepository.DeleteAsync(id);
 
     }
 }

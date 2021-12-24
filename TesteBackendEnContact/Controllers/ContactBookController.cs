@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Core.Domain.ContactBook;
-using TesteBackendEnContact.Core.Interface.ContactBook;
 using TesteBackendEnContact.Repository.Interface;
 using TesteBackendEnContact.ViewModels;
 
@@ -14,9 +13,9 @@ namespace TesteBackendEnContact.Controllers
     public class ContactBookController : ControllerBase
     {
         private readonly ILogger<ContactBookController> _logger;
-        private readonly IRepository<IContactBook> _contactBookRepository;
+        private readonly IContactBookRepository _contactBookRepository;
 
-        public ContactBookController(ILogger<ContactBookController> logger, IRepository<IContactBook> contactBookRepository)
+        public ContactBookController(ILogger<ContactBookController> logger, IContactBookRepository contactBookRepository)
         {
             _logger = logger;
             _contactBookRepository = contactBookRepository;
@@ -24,19 +23,19 @@ namespace TesteBackendEnContact.Controllers
 
 
         [HttpGet]
-        public async Task<ResultViewModel<IEnumerable<IContactBook>>> Get() => await _contactBookRepository.GetAllAsync();
+        public async Task<ResultViewModel<IEnumerable<ContactBook>>> Get() => await _contactBookRepository.GetAllAsync();
 
         [HttpGet("{id}")]
-        public async Task<ResultViewModel<IContactBook>> Get(int id) => await _contactBookRepository.GetAsync(id);
+        public async Task<ResultViewModel<ContactBook>> Get(int id) => await _contactBookRepository.GetAsync(id);
 
         [HttpPost]
-        public async Task<ResultViewModel<IContactBook>> Post(ContactBook contactBook) => await _contactBookRepository.SaveAsync(contactBook);
+        public async Task<ResultViewModel<ContactBook>> Post(ContactBook contactBook) => await _contactBookRepository.SaveAsync(contactBook);
 
         [HttpPut("{id}")]
-        public async Task<ResultViewModel<IContactBook>> Update(int id, [FromBody] ContactBook model) => await _contactBookRepository.UpdateAsync(id, model);
+        public async Task<ResultViewModel<ContactBook>> Update(int id, [FromBody] ContactBook model) => await _contactBookRepository.UpdateAsync(id, model);
 
         [HttpDelete("{id}")]
-        public async Task<ResultViewModel<IContactBook>> Delete(int id) => await _contactBookRepository.DeleteAsync(id);
+        public async Task<ResultViewModel<ContactBook>> Delete(int id) => await _contactBookRepository.DeleteAsync(id);
 
 
 

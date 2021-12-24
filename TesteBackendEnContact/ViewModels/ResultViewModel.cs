@@ -4,6 +4,8 @@ namespace TesteBackendEnContact.ViewModels
 {
     public class ResultViewModel<T>
     {
+
+
         public T Data { get; set; }
         public List<string> Errors { get; set; } = new();
 
@@ -26,5 +28,6 @@ namespace TesteBackendEnContact.ViewModels
         {
             Errors = errors;
         }
+
     }
 }
