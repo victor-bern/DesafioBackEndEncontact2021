@@ -19,8 +19,9 @@ namespace TesteBackendEnContact.Services
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Email)
-                })
+                    new Claim(ClaimTypes.Name, user.Email),
+                    new Claim(ClaimTypes.Sid, user.Id.ToString())
+            })
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

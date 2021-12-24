@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace TesteBackendEnContact.Controllers
 {
     [ApiController]
     [Route("contacts")]
+    [Authorize]
+
     public class ContactController : ControllerBase
     {
         private readonly ILogger<ContactController> _logger;
