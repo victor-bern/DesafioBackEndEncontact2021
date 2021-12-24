@@ -13,6 +13,7 @@ namespace TesteBackendEnContact.Repository.Interface
         Task<ResultViewModel<ContactBook>> SaveAsync(ContactBook entity);
         Task<ResultViewModel<ContactBook>> UpdateAsync(int id, ContactBook entity);
         Task<ResultViewModel<ContactBook>> DeleteAsync(int id);
+        Task TruncateTables();
 
     }
 }

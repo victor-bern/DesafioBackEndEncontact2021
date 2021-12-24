@@ -17,7 +17,7 @@ namespace TesteBackendEnContact.Core.Domain.ContactBook.Contact
         {
 
         }
-        public Contact(Contact contact)
+        public Contact(Contact contact) : base(contact.Id)
         {
             Name = contact.Name;
             Phone = contact.Phone;

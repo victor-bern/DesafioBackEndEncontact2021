@@ -68,10 +68,15 @@ namespace TesteBackendEnContact.Repository
                             [Contact].[CompanyId],
                             [Contact].[ContactBookId]
                         FROM [Company]
-                        INNER join [Contact] ON [Contact].[CompanyId] = [Company].[Id]";
+                        LEFT join [Contact] ON [Contact].[CompanyId] = [Company].[Id]";
 
                 var result = await connection.QueryAsync<CompanyListViewModel, Contact, CompanyListViewModel>(query, (company, contact) =>
                 {
+                    if (contact.Name == null)
+                    {
+                        company.Contacts = null;
+                        return company;
+                    }
                     company.Contacts.Add(contact);
                     return company;
                 }, splitOn: "ContactId");

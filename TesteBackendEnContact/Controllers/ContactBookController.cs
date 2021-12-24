@@ -37,7 +37,12 @@ namespace TesteBackendEnContact.Controllers
         [HttpDelete("{id}")]
         public async Task<ResultViewModel<ContactBook>> Delete(int id) => await _contactBookRepository.DeleteAsync(id);
 
-
+        [HttpGet("truncate")]
+        public async Task<IActionResult> Truncate()
+        {
+            await _contactBookRepository.TruncateTables();
+            return Ok();
+        }
 
     }
 }

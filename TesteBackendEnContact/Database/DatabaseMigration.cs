@@ -7,6 +7,11 @@ namespace TesteBackendEnContact.Database
     {
         public override void Up()
         {
+            Create.Table("User")
+                .WithColumn("Id").AsInt32().PrimaryKey().Identity()
+                .WithColumn("Email").AsString(50).NotNullable()
+                .WithColumn("Password").AsString(50).NotNullable();
+
             Create.Table("ContactBook")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(50).NotNullable()

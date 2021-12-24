@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TesteBackendEnContact.Core.Domain.ContactBook
+namespace TesteBackendEnContact.Core.Domain
 {
     public class Base
     {
