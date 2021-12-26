@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Text;
 using TesteBackendEnContact.Database;
+using TesteBackendEnContact.Extensions;
 using TesteBackendEnContact.Repository;
 using TesteBackendEnContact.Repository.Interface;
 using TesteBackendEnContact.Services;
@@ -36,12 +37,15 @@ namespace TesteBackendEnContact
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TesteBackendEnContact", Version = "v1" });
             });
 
-            var key = Encoding.ASCII.GetBytes("cmF0aW5ob29v");
+            Configuration.LoadConfiguration();
+
+            var key = Encoding.ASCII.GetBytes(KeyConfiguration.Key);
 
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
             }).AddJwtBearer(opt =>
             {
                 opt.TokenValidationParameters = new TokenValidationParameters
@@ -79,8 +83,8 @@ namespace TesteBackendEnContact
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TesteBackendEnContact v1"));
             }
 
+            app.UseAuthentication();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
