@@ -15,7 +15,7 @@ namespace TesteBackendEnContact.Services
             var key = Encoding.ASCII.GetBytes("cmF0aW5ob29v");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Expires = DateTime.Now.AddHours(2),
+                Expires = DateTime.Now.AddHours(6),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Subject = new ClaimsIdentity(new Claim[]
                 {

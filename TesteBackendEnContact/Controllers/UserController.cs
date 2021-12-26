@@ -29,7 +29,7 @@ namespace TesteBackendEnContact.Controllers
         public async Task<ResultViewModel<IEnumerable<User>>> Get() => await _userRepository.GetAllAsync();
 
         [HttpGet("{id}")]
-        [Authorize]
+
         public async Task<ResultViewModel<User>> Get(int id) => await _userRepository.GetAsync(id);
 
         [HttpPost]

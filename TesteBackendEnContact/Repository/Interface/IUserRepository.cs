@@ -9,6 +9,7 @@ namespace TesteBackendEnContact.Repository.Interface
     {
         Task<ResultViewModel<IEnumerable<User>>> GetAllAsync();
         Task<ResultViewModel<User>> GetAsync(int id);
+        Task<ResultViewModel<User>> GetByEmailAsync(string email);
         Task<ResultViewModel<User>> SaveAsync(User entity);
         Task<ResultViewModel<User>> UpdateAsync(int id, User entity);
         Task<ResultViewModel<User>> DeleteAsync(int id);

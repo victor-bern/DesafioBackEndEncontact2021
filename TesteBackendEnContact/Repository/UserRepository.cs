@@ -31,8 +31,6 @@ namespace TesteBackendEnContact.Repository
             return new ResultViewModel<IEnumerable<User>>(result.ToList());
         }
 
-
-
         public async Task<ResultViewModel<User>> GetAsync(int id)
         {
             try
@@ -55,7 +53,30 @@ namespace TesteBackendEnContact.Repository
             }
 
         }
+        public async Task<ResultViewModel<User>> GetByEmailAsync(string email)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(_databaseConfig.ConnectionString);
 
+                var query = "SELECT * FROM User where Email = @email";
+
+                var user = await connection.QuerySingleOrDefaultAsync<User>(query, new { email });
+
+                if (user == null) return new ResultViewModel<User>("Usuário não encontrado");
+
+                return new ResultViewModel<User>(user);
+            }
+            catch (SqliteException)
+            {
+                return new ResultViewModel<User>("Houve um erro ao tentar recuperar os dados");
+            }
+            catch (Exception)
+            {
+                return new ResultViewModel<User>("Internal Server Error");
+            }
+
+        }
 
         public async Task<ResultViewModel<User>> SaveAsync(User entity)
         {
@@ -124,5 +145,7 @@ namespace TesteBackendEnContact.Repository
             }
         }
 
+
     }
+
 }
