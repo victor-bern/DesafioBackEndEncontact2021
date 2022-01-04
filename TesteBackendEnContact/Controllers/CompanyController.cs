@@ -24,10 +24,13 @@ namespace TesteBackendEnContact.Controllers
         }
 
         [HttpGet]
-        public async Task<ResultViewModel<IEnumerable<CompanyListViewModel>>> Get() => await _companyRepository.GetAllAsync();
+        public async Task<ResultViewModel<IEnumerable<CompanyWithContactListViewModel>>> Get() => await _companyRepository.GetAllAsync();
 
         [HttpGet("{id}")]
         public async Task<ResultViewModel<Company>> Get(int id) => await _companyRepository.GetAsync(id);
+
+        [HttpGet("get-company-in-specific-contactBook")]
+        public async Task<ResultViewModel<CompanyWithContactListViewModel>> GetCompanyInSpecificContactBook([FromQuery] string companyName, [FromQuery] int contactBookId) => await _companyRepository.GetContactsInCompanyByName(companyName, contactBookId);
 
         [HttpPost]
         public async Task<ResultViewModel<Company>> Post([FromBody] Company company) => await _companyRepository.SaveAsync(company);

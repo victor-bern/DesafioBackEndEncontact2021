@@ -48,12 +48,11 @@ namespace TesteBackendEnContact.Controllers
 
         public async Task<IActionResult> Update(int id, [FromBody] User model)
         {
-            var claims = User.Claims;
             if (!ModelState.IsValid) return BadRequest(new ResultViewModel<User>(ModelState.GetErrors()));
 
 
             var user = await _userRepository.UpdateAsync(id, model);
-            return Ok(user.Data);
+            return Ok(user);
         }
 
         [HttpDelete("{id}")]
