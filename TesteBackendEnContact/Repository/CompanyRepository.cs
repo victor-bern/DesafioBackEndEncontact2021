@@ -69,20 +69,28 @@ namespace TesteBackendEnContact.Repository
                             [Contact].[CompanyId],
                             [Contact].[ContactBookId]
                         FROM [Company]
-                        LEFT join [Contact] ON [Contact].[CompanyId] = [Company].[Id]";
+                        LEFT join [Contact] ON [Contact].[CompanyId] = [Company].[Id]
+                        ORDER BY [Contact].[Name]
+                        ";
 
                 var result = await connection.QueryAsync<CompanyWithContactListViewModel, Contact, CompanyWithContactListViewModel>(query, (company, contact) =>
                 {
-                    if (contact.Name == null)
+                    var comp = companies.Where(x => x.Id == company.Id).FirstOrDefault();
+                    if (comp == null)
                     {
-                        company.Contacts = null;
-                        return company;
+                        comp = company;
+                        if (contact.CompanyId == comp.Id) company.Contacts.Add(contact);
+                        companies.Add(comp);
                     }
-                    company.Contacts.Add(contact);
+                    else
+                    {
+                        comp.Contacts.Add(contact);
+                    }
+
                     return company;
                 }, splitOn: "ContactId");
 
-                return new ResultViewModel<IEnumerable<CompanyWithContactListViewModel>>(result);
+                return new ResultViewModel<IEnumerable<CompanyWithContactListViewModel>>(companies);
             }
             catch (SqliteException)
             {

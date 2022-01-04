@@ -68,7 +68,7 @@ namespace TesteBackendEnContact.Repository
                 param = param.ToLower();
                 param = char.ToUpper(param[0]) + param[1..].Replace(" ", "");
                 var query = "SELECT * FROM Contact WHERE " + param + " = @value";
-                var contact = await connection.QuerySingleAsync<Contact>(query, new { value });
+                var contact = await connection.QueryFirstOrDefaultAsync<Contact>(query, new { value });
 
                 if (contact == null) return new ResultViewModel<Contact>($"Não existe contato com esse {param}");
 
